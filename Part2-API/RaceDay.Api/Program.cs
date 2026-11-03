@@ -88,5 +88,5 @@ app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
 
 app.Run();
 
-// Makes the Program class visible to the test project (WebApplicationFactory<Program>).
+// Makes the Program class visible to the test project (WebApplicationFactory<Program>). 
 public partial class Program { }
