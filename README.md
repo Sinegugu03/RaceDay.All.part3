@@ -106,7 +106,9 @@ The GitHub Actions workflow runs on every push. It builds the API, the tests and
 
 **Successful build screenshot:**
 
-[Drag your green GitHub Actions screenshot here while editing this file on GitHub]
+<img width="1306" height="686" alt="Screenshot 2026-11-03 133217" src="https://github.com/user-attachments/assets/6623fa1e-10b5-4859-8125-f8019b0eeb64" />
+<img width="1257" height="886" alt="Screenshot 2026-11-03 140430" src="https://github.com/user-attachments/assets/73bd8bac-4e80-4bd3-a02c-63cb02cfa947" />
+
 
 ## Video walkthroughs
 
