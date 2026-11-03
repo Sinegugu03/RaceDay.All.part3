@@ -1,7 +1,7 @@
 # Runs the whole RaceDay system with ONE command:   docker compose up --build
 #   MVC website:  http://localhost:8081
 #   API/Swagger:  http://localhost:5080/swagger
-# Needs Docker Desktop with about 3 GB of free memory (SQL Server is memory hungry).
+# Needs Docker Desktop with about 3 GB of free memory (SQL Server is memory hungry). 
 
 services:
   sqlserver:
