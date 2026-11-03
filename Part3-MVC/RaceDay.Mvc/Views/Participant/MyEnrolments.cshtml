@@ -1,0 +1,62 @@
+@model List<EnrolmentDto>
+@{
+    ViewData["Title"] = "My enrolments";
+}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+        <div>
+            <p class="eyebrow">Your race calendar</p>
+            <h1 class="page-title mb-0">My enrolments</h1>
+        </div>
+        <a class="btn btn-rd" asp-controller="Home" asp-action="Index">Find another race</a>
+    </div>
+
+    <div class="status-legend mb-3" aria-label="Status guide">
+        <partial name="_StatusBadge" model="@("Confirmed")" /> your place is secured
+        <partial name="_StatusBadge" model="@("Pending")" /> waiting for the organiser
+        <partial name="_StatusBadge" model="@("Cancelled")" /> no longer active
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="state-card text-center">
+            <h2 class="section-title">You haven't enrolled in any events yet</h2>
+            <p>Browse upcoming races and pick a category to get started.</p>
+            <a class="btn btn-rd" asp-controller="Home" asp-action="Index">Browse events</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive panel p-0">
+            <table class="table rd-table align-middle mb-0">
+                <thead>
+                    <tr><th scope="col">Event</th><th scope="col">Category</th><th scope="col">Enrolled on</th><th scope="col">Status</th><th scope="col" class="text-end">Actions</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <td><a class="fw-semibold" asp-controller="Events" asp-action="Details" asp-route-id="@e.EventId">@e.EventName</a></td>
+                            <td>@e.CategoryName</td>
+                            <td>@e.EnrolmentDate.ToString("dd MMM yyyy")</td>
+                            <td><partial name="_StatusBadge" model="e.Status" /></td>
+                            <td class="text-end">
+                                @if (e.ResultStatus is null)
+                                {
+                                    <form asp-controller="Participant" asp-action="CancelEnrolment" method="post" class="d-inline" data-confirm="Cancel your enrolment in @e.EventName?">
+                                        <input type="hidden" name="id" value="@e.EnrolmentId" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Cancel</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-outline-dark btn-sm" asp-controller="Participant" asp-action="MyResults">See result</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

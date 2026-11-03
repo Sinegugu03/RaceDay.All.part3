@@ -1,0 +1,66 @@
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Upcoming races";
+}
+<section class="hero">
+    <div class="container">
+        <p class="eyebrow">Race day starts here</p>
+        <h1 class="hero__title">Find your next race</h1>
+        <p class="hero__lead">Browse upcoming runs, walks and cycle events. Pick a category and enrol in minutes.</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <form method="get" action="@Url.Action("Index", "Home")" class="filter-card" aria-label="Filter events">
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-4">
+                <label for="location" class="form-label">Location</label>
+                <input id="location" name="location" class="form-control" placeholder="e.g. Durban" value="@Model.Filter.Location" />
+            </div>
+            <div class="col-6 col-md-2">
+                <label for="type" class="form-label">Event type</label>
+                <select id="type" name="type" class="form-select">
+                    <option value="">All types</option>
+                    @foreach (var type in new[] { "Run", "Walk", "Cycle" })
+                    {
+                        <option value="@type" selected="@(Model.Filter.Type == type)">@type</option>
+                    }
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label for="from" class="form-label">From</label>
+                <input id="from" name="from" type="date" class="form-control" value="@(Model.Filter.From?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-6 col-md-2">
+                <label for="to" class="form-label">To</label>
+                <input id="to" name="to" type="date" class="form-control" value="@(Model.Filter.To?.ToString("yyyy-MM-dd"))" />
+            </div>
+            <div class="col-6 col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-rd flex-grow-1">Filter</button>
+                <a class="btn btn-outline-dark" asp-action="Index" title="Clear filters">Clear</a>
+            </div>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-warning mt-4" role="alert">@Model.Error</div>
+    }
+    else if (!Model.Events.Any())
+    {
+        <div class="state-card text-center mt-4">
+            <h2 class="section-title">No upcoming events found</h2>
+            <p class="mb-0">Try a different location or date range, or check back soon.</p>
+        </div>
+    }
+    else
+    {
+        <h2 class="section-title mt-4 mb-3">Upcoming events <span class="count-pill">@Model.Events.Count</span></h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            @foreach (var ev in Model.Events)
+            {
+                <div class="col"><partial name="_EventCard" model="ev" /></div>
+            }
+        </div>
+    }
+</div>

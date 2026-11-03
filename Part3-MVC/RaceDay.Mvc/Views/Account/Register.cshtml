@@ -1,0 +1,60 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Sign up";
+}
+<div class="container auth-wrap">
+    <div class="auth-card auth-card--wide">
+        <p class="eyebrow">Join the field</p>
+        <h1 class="page-title">Create your account</h1>
+        <form asp-action="Register" method="post" novalidate>
+            <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+            <fieldset class="mb-3">
+                <legend class="form-label">I want to use RaceDay as</legend>
+                <div class="role-choice">
+                    <input class="role-choice__input" type="radio" asp-for="Role" value="Participant" id="role-participant" />
+                    <label class="role-choice__card" for="role-participant">
+                        <strong>Participant</strong>
+                        <span>Find races, enrol and track my results</span>
+                    </label>
+                    <input class="role-choice__input" type="radio" asp-for="Role" value="Organiser" id="role-organiser" />
+                    <label class="role-choice__card" for="role-organiser">
+                        <strong>Organiser</strong>
+                        <span>Create events and capture results</span>
+                    </label>
+                </div>
+                <span asp-validation-for="Role" class="field-error"></span>
+            </fieldset>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label asp-for="FullName" class="form-label"></label>
+                    <input asp-for="FullName" class="form-control" autocomplete="name" />
+                    <span asp-validation-for="FullName" class="field-error"></span>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" autocomplete="email" />
+                    <span asp-validation-for="Email" class="field-error"></span>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label asp-for="Password" class="form-label"></label>
+                    <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="Password" class="field-error"></span>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                    <span asp-validation-for="ConfirmPassword" class="field-error"></span>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label asp-for="PhoneNumber" class="form-label"></label>
+                    <input asp-for="PhoneNumber" class="form-control" autocomplete="tel" />
+                    <span asp-validation-for="PhoneNumber" class="field-error"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-rd w-100 mt-4">Create account</button>
+        </form>
+        <p class="auth-switch">Already registered? <a asp-action="Login">Log in</a></p>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+@model EventDetailsViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = ev.Name;
+    var banner = ev.HasBanner ? Url.Action("EventBanner", "Images", new { id = ev.EventId }) : Url.Content("~/img/event-placeholder.svg");
+    var open = ev.Status is "Planned" or "Open";
+}
+<section class="event-hero" style="background-image: linear-gradient(180deg, rgba(11,27,46,.35), rgba(11,27,46,.92)), url('@banner');">
+    <div class="container">
+        <div class="d-flex gap-2 mb-2 flex-wrap">
+            <span class="type-chip type-chip--light">@ev.EventType</span>
+            <partial name="_StatusBadge" model="ev.Status" />
+        </div>
+        <h1 class="hero__title">@ev.Name</h1>
+        <p class="hero__lead mb-0">@Format.Date(ev.EventDate) · @ev.Location · @ev.DistanceKm.ToString("0.##") km</p>
+    </div>
+</section>
+
+<div class="container py-4">
+    <div class="row g-4">
+        <div class="col-12 col-lg-4">
+            <div class="panel">
+                <h2 class="section-title">About this event</h2>
+                <p>@(string.IsNullOrWhiteSpace(ev.Description) ? "No description has been added yet." : ev.Description)</p>
+                <dl class="detail-list mb-0">
+                    <dt>Date</dt><dd>@Format.Date(ev.EventDate)</dd>
+                    <dt>Location</dt><dd>@ev.Location</dd>
+                    <dt>Distance</dt><dd>@ev.DistanceKm.ToString("0.##") km</dd>
+                    <dt>Type</dt><dd>@ev.EventType</dd>
+                    <dt>Organiser</dt><dd>@ev.OrganiserName</dd>
+                </dl>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8">
+            <h2 class="section-title mb-3">Choose your category</h2>
+            @if (ev.Categories is null || !ev.Categories.Any())
+            {
+                <div class="state-card">No categories have been added to this event yet.</div>
+            }
+            else
+            {
+                <div class="row g-3">
+                    @foreach (var cat in ev.Categories)
+                    {
+                        <div class="col-12 col-md-6">
+                            <div class="category-card h-100">
+                                <h3 class="category-card__name">@cat.Name</h3>
+                                <ul class="list-unstyled event-meta">
+                                    <li>@cat.DistanceKm.ToString("0.##") km</li>
+                                    <li>Starts @Format.ShortTime(cat.StartTime)</li>
+                                    <li>@cat.MaxParticipants places</li>
+                                    <li class="fw-semibold">@Format.Money(cat.Fee)</li>
+                                </ul>
+                                @if (Model.Role == "Participant")
+                                {
+                                    @if (Model.EnrolledCategoryIds.Contains(cat.CategoryId))
+                                    {
+                                        <a class="btn btn-outline-dark w-100" asp-controller="Participant" asp-action="MyEnrolments">You're enrolled – view</a>
+                                    }
+                                    else if (!open)
+                                    {
+                                        <button class="btn btn-outline-dark w-100" disabled>Enrolment closed</button>
+                                    }
+                                    else
+                                    {
+                                        <form asp-controller="Events" asp-action="Enrol" method="post">
+                                            <input type="hidden" name="eventId" value="@ev.EventId" />
+                                            <input type="hidden" name="categoryId" value="@cat.CategoryId" />
+                                            <button type="submit" class="btn btn-rd w-100">Enrol in @cat.Name</button>
+                                        </form>
+                                    }
+                                }
+                                else if (Model.Role == "Organiser")
+                                {
+                                    <p class="small text-muted mb-0">Organisers can't enrol in events.</p>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-rd w-100" asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Url.Action("Details", "Events", new { id = ev.EventId })">Log in to enrol</a>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

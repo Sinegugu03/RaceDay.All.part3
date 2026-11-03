@@ -1,0 +1,5 @@
+@model string
+@{
+    var css = (Model ?? "").ToLowerInvariant().Replace(" ", "-");
+}
+<span class="status-badge status-@css"><span class="status-badge__dot" aria-hidden="true"></span>@Model</span>

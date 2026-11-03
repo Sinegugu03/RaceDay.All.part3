@@ -1,0 +1,59 @@
+@model EventEnrolmentsViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = "Results – " + ev.Name;
+    var active = Model.Enrolments.Where(e => e.Status != "Cancelled").ToList();
+}
+<div class="container py-4">
+    <p class="eyebrow">@ev.Name · @Format.Date(ev.EventDate)</p>
+    <h1 class="page-title">Enter results</h1>
+    <p class="text-muted">Capture each participant's finish time and finishing position once the event has concluded. Saved results are published straight away and appear on the participant's "My results" page.</p>
+
+    @if (!active.Any())
+    {
+        <div class="state-card text-center"><p class="mb-0">There are no active enrolments to capture results for.</p></div>
+    }
+    else
+    {
+        @foreach (var group in active.GroupBy(e => e.CategoryName))
+        {
+            <h2 class="section-title mt-4 mb-2">@group.Key <span class="count-pill">@group.Count()</span></h2>
+            <div class="result-rows">
+                @foreach (var e in group)
+                {
+                    var hasResult = e.ResultStatus is not null;
+                    <form asp-action="SaveResult" method="post" class="result-row" aria-label="Result for @e.ParticipantName">
+                        <input type="hidden" name="EventId" value="@ev.EventId" />
+                        <input type="hidden" name="EnrolmentId" value="@e.EnrolmentId" />
+                        <input type="hidden" name="HasResult" value="@(hasResult ? "true" : "false")" />
+                        <div class="result-row__who">
+                            <strong>@e.ParticipantName</strong>
+                            <partial name="_StatusBadge" model="e.Status" />
+                        </div>
+                        <div>
+                            <label class="form-label small mb-1" for="time-@e.EnrolmentId">Finish time</label>
+                            <input id="time-@e.EnrolmentId" name="FinishTime" type="time" step="1" class="form-control form-control-sm" value="@(e.FinishTime?.ToString("HH:mm:ss"))" />
+                        </div>
+                        <div>
+                            <label class="form-label small mb-1" for="pos-@e.EnrolmentId">Position</label>
+                            <input id="pos-@e.EnrolmentId" name="Position" type="number" min="1" class="form-control form-control-sm" value="@e.Position" />
+                        </div>
+                        <div>
+                            <label class="form-label small mb-1" for="res-@e.EnrolmentId">Result</label>
+                            <select id="res-@e.EnrolmentId" name="Status" class="form-select form-select-sm">
+                                @foreach (var s in new[] { "Finished", "DNF", "DQ", "Not Started" })
+                                {
+                                    <option value="@s" selected="@((e.ResultStatus ?? "Finished") == s)">@s</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="result-row__action">
+                            <button type="submit" class="btn btn-rd btn-sm">@(hasResult ? "Update result" : "Save & publish")</button>
+                        </div>
+                    </form>
+                }
+            </div>
+        }
+    }
+    <div class="mt-4"><a class="btn btn-outline-dark" asp-action="Events">Back to my events</a></div>
+</div>

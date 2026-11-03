@@ -1,0 +1,47 @@
+# Runs the whole RaceDay system with ONE command:   docker compose up --build
+#   MVC website:  http://localhost:8081
+#   API/Swagger:  http://localhost:5080/swagger
+# Needs Docker Desktop with about 3 GB of free memory (SQL Server is memory hungry).
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "RaceDay_Passw0rd!"
+    volumes:
+      - sqldata:/var/opt/mssql
+
+  azurite:
+    # Azure Blob Storage emulator - same API as the real service, no Azure account needed
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite-blob --blobHost 0.0.0.0 --location /data --skipApiVersionCheck
+    volumes:
+      - azuritedata:/data
+
+  api:
+    build: ./Part2-API
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development   # seeds the demo accounts
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=RaceDayApiDB;User Id=sa;Password=RaceDay_Passw0rd!;TrustServerCertificate=True;MultipleActiveResultSets=true"
+      BlobStorage__ConnectionString: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;"
+      BlobStorage__ContainerName: raceday-images
+    depends_on:
+      - sqlserver
+      - azurite
+    ports:
+      - "5080:8080"
+
+  mvc:
+    build: ./Part3-MVC
+    environment:
+      ApiSettings__BaseUrl: http://api:8080
+    depends_on:
+      - api
+    ports:
+      - "8081:8080"
+
+volumes:
+  sqldata:
+  azuritedata:

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="RaceDay logo">
+  <circle cx="32" cy="32" r="30" fill="#c8f031"/>
+  <path d="M14 44 L30 20 H40 L24 44 Z" fill="#0b1b2e"/>
+  <path d="M30 44 L46 20 H54 L38 44 Z" fill="#ff5a1f"/>
+</svg>

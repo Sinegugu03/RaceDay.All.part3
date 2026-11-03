@@ -1,0 +1,53 @@
+@model ProfileViewModel
+@{
+    ViewData["Title"] = "My profile";
+    var avatar = Model.HasProfilePicture
+        ? Url.Action("ProfilePicture", "Images", new { id = Model.UserId })
+        : Url.Content("~/img/avatar-placeholder.svg");
+}
+<div class="container py-4">
+    <p class="eyebrow">Your account</p>
+    <h1 class="page-title">My profile</h1>
+
+    <div class="row g-4">
+        <div class="col-12 col-md-4 col-lg-3">
+            <div class="panel text-center">
+                <img class="avatar-lg" src="@avatar" alt="Your profile picture" />
+                <p class="fw-semibold mt-3 mb-0">@Model.FullName</p>
+                <p class="text-muted mb-0">@Model.Role</p>
+            </div>
+        </div>
+        <div class="col-12 col-md-8 col-lg-9">
+            <form asp-action="Index" method="post" enctype="multipart/form-data" class="panel" novalidate>
+                <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="HasProfilePicture" />
+                <input type="hidden" asp-for="Email" />
+                <input type="hidden" asp-for="Role" />
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="field-error"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="field-error"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="email-readonly">Email address</label>
+                        <input id="email-readonly" class="form-control" value="@Model.Email" readonly />
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Picture" class="form-label"></label>
+                        <input asp-for="Picture" type="file" class="form-control" accept="image/png,image/jpeg,image/webp" data-max-mb="5" />
+                        <div class="form-text">JPG, PNG or WEBP, up to 5 MB.</div>
+                        <span asp-validation-for="Picture" class="field-error"></span>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-rd mt-4">Save changes</button>
+            </form>
+        </div>
+    </div>
+</div>

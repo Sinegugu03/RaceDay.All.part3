@@ -1,0 +1,22 @@
+@model EventDto
+@{
+    var image = Model.HasBanner
+        ? Url.Action("EventBanner", "Images", new { id = Model.EventId })
+        : Url.Content("~/img/event-placeholder.svg");
+}
+<article class="event-card h-100">
+    <img class="event-card__img" src="@image" alt="@(Model.HasBanner ? "Banner image for " + Model.Name : "")" loading="lazy" />
+    <div class="event-card__body">
+        <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+            <span class="type-chip">@Model.EventType</span>
+            <partial name="_StatusBadge" model="Model.Status" />
+        </div>
+        <h3 class="event-card__title">@Model.Name</h3>
+        <ul class="event-meta list-unstyled">
+            <li><span class="visually-hidden">Date: </span>@Format.Date(Model.EventDate)</li>
+            <li><span class="visually-hidden">Location: </span>@Model.Location</li>
+            <li><span class="visually-hidden">Distance: </span>@Model.DistanceKm.ToString("0.##") km</li>
+        </ul>
+        <a class="btn btn-rd stretched-link mt-auto" asp-controller="Events" asp-action="Details" asp-route-id="@Model.EventId">View event &amp; categories</a>
+    </div>
+</article>

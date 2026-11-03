@@ -1,0 +1,108 @@
+@{
+    var role = Context.Session.GetString("Role");
+    var userName = Context.Session.GetString("FullName");
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var action = ViewContext.RouteData.Values["action"]?.ToString();
+}
+@functions {
+    private string Active(string? current, string controller, string? action = null, string? currentAction = null) =>
+        current == controller && (action is null || currentAction == action) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] – RaceDay</title>
+    <link rel="icon" type="image/svg+xml" href="~/img/logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <a class="visually-hidden-focusable rd-skip" href="#main">Skip to main content</a>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark rd-navbar" aria-label="Main navigation">
+            <div class="container">
+                <a class="navbar-brand rd-brand" asp-controller="@(role == "Organiser" ? "Organiser" : "Home")" asp-action="@(role == "Organiser" ? "Dashboard" : "Index")">
+                    <img src="~/img/logo.svg" alt="" width="34" height="34" />
+                    <span>Race<span class="rd-brand__accent">Day</span></span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        @if (role == "Organiser")
+                        {
+                            <li class="nav-item"><a class="nav-link @Active(controller, "Organiser", "Dashboard", action)" asp-controller="Organiser" asp-action="Dashboard">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link @Active(controller, "Organiser", "Events", action)" asp-controller="Organiser" asp-action="Events">My events</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Organiser" asp-action="CreateEvent">Create event</a></li>
+                            <li class="nav-item"><a class="nav-link @Active(controller, "Profile")" asp-controller="Profile" asp-action="Index">Profile</a></li>
+                        }
+                        else if (role == "Participant")
+                        {
+                            <li class="nav-item"><a class="nav-link @Active(controller, "Home")" asp-controller="Home" asp-action="Index">Find a race</a></li>
+                            <li class="nav-item"><a class="nav-link @Active(controller, "Participant", "MyEnrolments", action)" asp-controller="Participant" asp-action="MyEnrolments">My enrolments</a></li>
+                            <li class="nav-item"><a class="nav-link @Active(controller, "Participant", "MyResults", action)" asp-controller="Participant" asp-action="MyResults">My results</a></li>
+                            <li class="nav-item"><a class="nav-link @Active(controller, "Profile")" asp-controller="Profile" asp-action="Index">Profile</a></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link @Active(controller, "Home")" asp-controller="Home" asp-action="Index">Find a race</a></li>
+                        }
+                    </ul>
+                    <div class="d-flex align-items-center gap-2">
+                        @if (role is not null)
+                        {
+                            <span class="rd-user" title="Logged in as @role">
+                                <span class="rd-user__role">@role</span>
+                                <span class="rd-user__name">@userName</span>
+                            </span>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-outline-light btn-sm">Log out</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-light btn-sm" asp-controller="Account" asp-action="Login">Log in</a>
+                            <a class="btn btn-rd btn-sm" asp-controller="Account" asp-action="Register">Sign up</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main" class="rd-main">
+        @if (TempData["Success"] is string || TempData["Error"] is string)
+        {
+            <div class="container pt-3">
+                @if (TempData["Success"] is string okMessage)
+                {
+                    <div class="alert alert-success rd-alert" role="status">@okMessage</div>
+                }
+                @if (TempData["Error"] is string errorMessage)
+                {
+                    <div class="alert alert-danger rd-alert" role="alert">@errorMessage</div>
+                }
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="rd-footer">
+        <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
+            <span>© @DateTime.Now.Year RaceDay – race events made simple.</span>
+            <span>Run. Walk. Cycle. Finish strong.</span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

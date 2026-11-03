@@ -1,0 +1,60 @@
+@model EventEnrolmentsViewModel
+@{
+    var ev = Model.Event;
+    ViewData["Title"] = "Enrolments – " + ev.Name;
+}
+<div class="container py-4">
+    <p class="eyebrow">@ev.Name · @Format.Date(ev.EventDate)</p>
+    <h1 class="page-title">Enrolments</h1>
+
+    <div class="status-legend mb-3" aria-label="Status guide">
+        <partial name="_StatusBadge" model="@("Confirmed")" /> place secured
+        <partial name="_StatusBadge" model="@("Pending")" /> waiting for you to confirm
+        <partial name="_StatusBadge" model="@("Cancelled")" /> no longer active
+    </div>
+
+    @if (!Model.Enrolments.Any())
+    {
+        <div class="state-card text-center"><p class="mb-0">Nobody has enrolled for this event yet.</p></div>
+    }
+    else
+    {
+        @foreach (var group in Model.Enrolments.GroupBy(e => e.CategoryName))
+        {
+            <h2 class="section-title mt-4 mb-2">@group.Key <span class="count-pill">@group.Count()</span></h2>
+            <div class="table-responsive panel p-0">
+                <table class="table rd-table align-middle mb-0">
+                    <thead><tr><th scope="col">Participant</th><th scope="col">Enrolled on</th><th scope="col">Status</th><th scope="col" class="text-end">Change status</th></tr></thead>
+                    <tbody>
+                        @foreach (var e in group)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@e.ParticipantName</td>
+                                <td>@e.EnrolmentDate.ToString("dd MMM yyyy")</td>
+                                <td><partial name="_StatusBadge" model="e.Status" /></td>
+                                <td class="text-end">
+                                    <form asp-action="SetEnrolmentStatus" method="post" class="d-inline-flex gap-1">
+                                        <input type="hidden" name="eventId" value="@ev.EventId" />
+                                        <input type="hidden" name="enrolmentId" value="@e.EnrolmentId" />
+                                        <label class="visually-hidden" for="status-@e.EnrolmentId">Status for @e.ParticipantName</label>
+                                        <select id="status-@e.EnrolmentId" name="status" class="form-select form-select-sm">
+                                            @foreach (var s in new[] { "Pending", "Confirmed", "Cancelled" })
+                                            {
+                                                <option value="@s" selected="@(e.Status == s)">@s</option>
+                                            }
+                                        </select>
+                                        <button type="submit" class="btn btn-outline-dark btn-sm">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    }
+    <div class="mt-4 d-flex gap-2">
+        <a class="btn btn-outline-dark" asp-action="Events">Back to my events</a>
+        <a class="btn btn-rd" asp-action="Results" asp-route-eventId="@ev.EventId">Enter results</a>
+    </div>
+</div>

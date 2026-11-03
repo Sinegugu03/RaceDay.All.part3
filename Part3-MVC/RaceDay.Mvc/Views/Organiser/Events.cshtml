@@ -1,0 +1,53 @@
+@model List<OrganiserEventDto>
+@{
+    ViewData["Title"] = "My events";
+}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+        <div>
+            <p class="eyebrow">Organiser</p>
+            <h1 class="page-title mb-0">My events</h1>
+        </div>
+        <a class="btn btn-rd" asp-action="CreateEvent">Create event</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="state-card text-center"><p class="mb-3">No events yet.</p><a class="btn btn-rd" asp-action="CreateEvent">Create your first event</a></div>
+    }
+    else
+    {
+        <div class="table-responsive panel p-0">
+            <table class="table rd-table align-middle mb-0">
+                <thead><tr><th scope="col">Event</th><th scope="col">Date</th><th scope="col">Type</th><th scope="col">Distance</th><th scope="col">Status</th><th scope="col" class="text-end">Actions</th></tr></thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr>
+                            <td>
+                                <a class="fw-semibold" asp-controller="Events" asp-action="Details" asp-route-id="@e.EventId">@e.Name</a><br />
+                                <small class="text-muted">@e.Location · @e.CategoryCount categories · @e.EnrolmentCount enrolled</small>
+                            </td>
+                            <td>@Format.Date(e.EventDate)</td>
+                            <td><span class="type-chip">@e.EventType</span></td>
+                            <td>@e.DistanceKm.ToString("0.##") km</td>
+                            <td><partial name="_StatusBadge" model="e.Status" /></td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Actions for @e.Name">
+                                    <a class="btn btn-outline-dark" asp-action="EditEvent" asp-route-id="@e.EventId">Edit</a>
+                                    <a class="btn btn-outline-dark" asp-action="Categories" asp-route-eventId="@e.EventId">Categories</a>
+                                    <a class="btn btn-outline-dark" asp-action="Enrolments" asp-route-eventId="@e.EventId">Enrolments</a>
+                                    <a class="btn btn-outline-dark" asp-action="Results" asp-route-eventId="@e.EventId">Results</a>
+                                </div>
+                                <form asp-action="DeleteEvent" method="post" class="d-inline ms-1" data-confirm="Delete &quot;@e.Name&quot;? This cannot be undone.">
+                                    <input type="hidden" name="id" value="@e.EventId" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

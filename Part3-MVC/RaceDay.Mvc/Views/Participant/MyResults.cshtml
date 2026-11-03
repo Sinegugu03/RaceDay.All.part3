@@ -1,0 +1,45 @@
+@model List<MyResultDto>
+@{
+    ViewData["Title"] = "My results";
+}
+<div class="container py-4">
+    <p class="eyebrow">Your race history</p>
+    <h1 class="page-title">My results</h1>
+
+    @if (!Model.Any())
+    {
+        <div class="state-card text-center">
+            <h2 class="section-title">No results yet</h2>
+            <p class="mb-0">Your results appear here once an organiser has captured them after your event.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var r in Model)
+            {
+                <div class="col-12 col-md-6 col-xl-4">
+                    <article class="result-card h-100">
+                        <div class="result-card__position">
+                            @if (r.Status == "Finished" && r.Position is not null)
+                            {
+                                <span class="result-card__rank">@Format.Ordinal(r.Position.Value)</span>
+                                <span class="result-card__of">out of @r.TotalFinishers finishers</span>
+                            }
+                            else
+                            {
+                                <span class="result-card__rank result-card__rank--small">@r.Status</span>
+                            }
+                        </div>
+                        <h2 class="result-card__event">@r.EventName</h2>
+                        <dl class="detail-list mb-0">
+                            <dt>Date</dt><dd>@Format.Date(r.EventDate)</dd>
+                            <dt>Category</dt><dd>@r.CategoryName</dd>
+                            <dt>Finish time</dt><dd class="time-value">@Format.Time(r.FinishTime)</dd>
+                        </dl>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+</div>

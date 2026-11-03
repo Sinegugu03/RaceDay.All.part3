@@ -1,0 +1,76 @@
+@model OrganiserDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<div class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-4">
+        <div>
+            <p class="eyebrow">Organiser</p>
+            <h1 class="page-title mb-0">Dashboard</h1>
+        </div>
+        <a class="btn btn-rd" asp-action="CreateEvent">Create a new event</a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="alert alert-warning" role="alert">@Model.Error</div>
+    }
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-4"><div class="stat-tile"><span class="stat-tile__value">@Model.TotalEvents</span><span class="stat-tile__label">Events created</span></div></div>
+        <div class="col-6 col-lg-4"><div class="stat-tile"><span class="stat-tile__value">@Model.UpcomingEvents</span><span class="stat-tile__label">Upcoming events</span></div></div>
+        <div class="col-12 col-lg-4"><div class="stat-tile stat-tile--accent"><span class="stat-tile__value">@Model.TotalEnrolments</span><span class="stat-tile__label">Total enrolments</span></div></div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+            <h2 class="section-title mb-3">Enrolments per event</h2>
+            @if (!Model.Events.Any())
+            {
+                <div class="state-card text-center">
+                    <p>You haven't created any events yet.</p>
+                    <a class="btn btn-rd" asp-action="CreateEvent">Create your first event</a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive panel p-0">
+                    <table class="table rd-table align-middle mb-0">
+                        <thead><tr><th scope="col">Event</th><th scope="col">Date</th><th scope="col">Status</th><th scope="col" class="text-end">Enrolments</th><th scope="col" class="text-end">Manage</th></tr></thead>
+                        <tbody>
+                            @foreach (var e in Model.Events)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@e.Name</td>
+                                    <td>@Format.Date(e.EventDate)</td>
+                                    <td><partial name="_StatusBadge" model="e.Status" /></td>
+                                    <td class="text-end"><span class="count-pill">@e.EnrolmentCount</span></td>
+                                    <td class="text-end"><a class="btn btn-outline-dark btn-sm" asp-action="Enrolments" asp-route-eventId="@e.EventId">Enrolments</a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+        <div class="col-12 col-xl-4">
+            <h2 class="section-title mb-3">Upcoming event dates</h2>
+            @if (!Model.NextEvents.Any())
+            {
+                <div class="state-card">No upcoming events scheduled.</div>
+            }
+            else
+            {
+                <ol class="date-list list-unstyled">
+                    @foreach (var e in Model.NextEvents)
+                    {
+                        <li class="date-list__item">
+                            <span class="date-list__date"><strong>@e.EventDate.ToString("dd")</strong>@e.EventDate.ToString("MMM")</span>
+                            <span><strong>@e.Name</strong><br /><small class="text-muted">@e.Location · @e.EnrolmentCount enrolled</small></span>
+                        </li>
+                    }
+                </ol>
+            }
+        </div>
+    </div>
+</div>
