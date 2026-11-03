@@ -97,7 +97,8 @@ You need the .NET 8 SDK and SQL Server (Express, LocalDB or full).
 dotnet test RaceDay.All.sln
 ```
 
-77 unit tests run the real API in memory with an in-memory database and a fake blob store, so they need neither SQL Server nor Azure.
+77 unit tests run the real API in memory with an in-memory database and a fake blob store, so they need neither SQL Server nor Azure.<img width="1917" height="936" alt="Screenshot 2026-11-03 132910" src="https://github.com/user-attachments/assets/982e98f5-db46-4605-807b-bc485f4a1409" />
+
 
 ## CI/CD
 
